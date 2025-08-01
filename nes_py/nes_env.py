@@ -49,6 +49,10 @@ _LIB.Reset.restype = None
 # setup the argument and return types for Step
 _LIB.Step.argtypes = [ctypes.c_void_p]
 _LIB.Step.restype = None
+_LIB.BusWrite.argtypes = [ctypes.c_void_p, ctypes.c_uint16, ctypes.c_uint8]
+_LIB.BusWrite.restype = None
+_LIB.BusRead.argtypes = [ctypes.c_void_p, ctypes.c_uint16]
+_LIB.BusRead.restype = ctypes.c_uint8
 # setup the argument and return types for Backup
 _LIB.Backup.argtypes = [ctypes.c_void_p]
 _LIB.Backup.restype = None
@@ -218,6 +222,14 @@ class NESEnv(gym.Env):
     def _restore(self):
         """Restore the backup state into the NES emulator."""
         _LIB.Restore(self._env)
+
+    def bus_write(self, address, value):
+        """Write a byte directly to the CPU bus."""
+        _LIB.BusWrite(self._env, address, value)
+
+    def bus_read(self, address):
+        """Read a byte directly from the CPU bus."""
+        return _LIB.BusRead(self._env, address)
 
     def _will_reset(self):
         """Handle any RAM hacking after a reset occurs."""

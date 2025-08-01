@@ -67,6 +67,16 @@ extern "C" {
         emu->step();
     }
 
+    /// Write a byte directly to the CPU bus
+    EXP void BusWrite(NES::Emulator* emu, unsigned int address, unsigned char value) {
+        emu->bus_write(address, value);
+    }
+
+    /// Read a byte directly from the CPU bus
+    EXP unsigned char BusRead(NES::Emulator* emu, unsigned int address) {
+        return emu->bus_read(address);
+    }
+
     /// Create a deep copy (i.e., a clone) of the given emulator
     EXP void Backup(NES::Emulator* emu) {
         emu->backup();
