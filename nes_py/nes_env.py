@@ -130,7 +130,7 @@ class NESEnv(gym.Env):
         if rom.is_pal:
             raise ValueError('ROM is PAL. PAL is not supported.')
         # check that the mapper is implemented
-        elif rom.mapper not in {0, 1, 2, 3}:
+        elif rom.mapper not in {0, 1, 2, 3, 4}:
             msg = 'ROM has an unsupported mapper number {}. please see https://github.com/Kautenja/nes-py/issues/28 for more information.'
             raise ValueError(msg.format(rom.mapper))
         # create a dedicated random number generator for the environment
