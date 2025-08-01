@@ -164,10 +164,12 @@ void MapperMMC3::update_banks() {
 void MapperMMC3::clock_irq(NES_Address address) {
     bool a12 = address & 0x1000;
     if (!a12) {
-        if (a12_low_counter < 3)
+        if (a12_low_counter < 0xff)
             ++a12_low_counter;
+        if (a12_low_counter > 15)
+            irq_active = false;  // clear pending IRQ each frame
     }
-    if (a12 && !prev_a12 && a12_low_counter >= 3) {
+    if (a12 && !prev_a12 && a12_low_counter >= 6) {
         if (irq_counter == 0 || irq_reload) {
             irq_counter = irq_latch;
             irq_reload = false;
