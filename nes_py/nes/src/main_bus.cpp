@@ -93,8 +93,12 @@ const NES_Byte* MainBus::get_page_pointer(NES_Byte page) {
 
 void MainBus::set_mapper(Mapper* mapper) {
     this->mapper = mapper;
-    if (mapper->hasExtendedRAM())
-        extended_ram.resize(0x2000);
+    if (mapper->hasExtendedRAM()) {
+        std::size_t banks = mapper->getPRGRAMBankCount();
+        if (banks == 0)
+            banks = 1;
+        extended_ram.assign(banks * 0x2000, 0);
+    }
 }
 
 }  // namespace NES
