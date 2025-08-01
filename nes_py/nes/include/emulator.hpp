@@ -48,6 +48,15 @@ class Emulator {
     PPU backup_ppu;
 
  public:
+    /// Write a byte directly to the CPU bus.
+    inline void bus_write(NES_Address address, NES_Byte value) {
+        bus.write(address, value);
+    }
+
+    /// Read a byte directly from the CPU bus.
+    inline NES_Byte bus_read(NES_Address address) { return bus.read(address); }
+
+ public:
     /// The width of the NES screen in pixels
     static const int WIDTH = SCANLINE_VISIBLE_DOTS;
     /// The height of the NES screen in pixels
