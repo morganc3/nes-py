@@ -21,8 +21,14 @@ void Cartridge::loadFromFile(std::string path) {
     // read internal data
     name_table_mirroring = header[6] & 0xB;
     mapper_number = ((header[6] >> 4) & 0xf) | (header[7] & 0xf0);
+    // determine the number of PRG-RAM banks; if the header reports 0,
+    // default to a single 8KB bank for compatibility.
     prg_ram_banks = header[8];
-    has_extended_ram = (header[8] != 0) || (header[6] & 0x2);
+    if (prg_ram_banks == 0)
+        prg_ram_banks = 1;
+    // extended RAM is available when PRG-RAM exists or the cartridge
+    // specifies battery-backed RAM in the mapper flags
+    has_extended_ram = (prg_ram_banks != 0) || (header[6] & 0x2);
     // read PRG-ROM 16KB banks
     NES_Byte banks = header[4];
     prg_rom.resize(0x4000 * banks);
