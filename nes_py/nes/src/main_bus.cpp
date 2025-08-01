@@ -97,7 +97,7 @@ void MainBus::set_mapper(Mapper* mapper) {
         std::size_t banks = mapper->getPRGRAMBankCount();
         if (banks == 0)
             banks = 1;
-        extended_ram.resize(banks * 0x2000);
+        extended_ram.assign(banks * 0x2000, 0);
     }
 }
 
