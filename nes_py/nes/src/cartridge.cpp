@@ -21,8 +21,14 @@ void Cartridge::loadFromFile(std::string path) {
     // read internal data
     name_table_mirroring = header[6] & 0xB;
     mapper_number = ((header[6] >> 4) & 0xf) | (header[7] & 0xf0);
-    prg_ram_banks = header[8];
-    has_extended_ram = (header[8] != 0) || (header[6] & 0x2);
+    // determine the number of PRG-RAM banks; when the header reports zero
+    // the iNES spec implies a single 8KB bank for backwards compatibility
+    prg_ram_banks = static_cast<std::size_t>(header[8]);
+    if (prg_ram_banks == 0)
+        prg_ram_banks = 1;
+    // extended RAM availability depends on the finalized PRG-RAM bank count
+    // and the battery-backed RAM flag in mapper byte 6
+    has_extended_ram = (prg_ram_banks > 0) || (header[6] & 0x2);
     // read PRG-ROM 16KB banks
     NES_Byte banks = header[4];
     prg_rom.resize(0x4000 * banks);
