@@ -132,6 +132,11 @@ class ROM(object):
         return bool(int(self.flags_6[6]))
 
     @property
+    def has_extended_ram(self):
+        """Return whether this ROM contains any PRG-RAM."""
+        return self.prg_ram_size > 0 or self.has_battery_backed_ram
+
+    @property
     def is_vertical_mirroring(self):
         """Return the mirroring mode this ROM uses."""
         return bool(int(self.flags_6[7]))
