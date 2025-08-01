@@ -4,6 +4,7 @@ from nes_py.nes_env import NESEnv
 from nes_py.tests.rom_file_abs_path import rom_file_abs_path
 
 RIGHT = 0b10000000
+LEFT = 0b01000000
 START = 0b00001000
 A = 0b00000001
 
@@ -28,9 +29,12 @@ class ShouldKeepStatusBarStatic(TestCase):
         for _ in range(60):
             state, _, _, _ = env.step(0)
         before = state[224:].copy()
-        # Move right for a while
-        for _ in range(120):
-            state, _, _, _ = env.step(RIGHT)
+        # Move back and forth for a while to exercise IRQ timing
+        for i in range(120):
+            if i % 2:
+                state, _, _, _ = env.step(RIGHT)
+            else:
+                state, _, _, _ = env.step(LEFT)
         after = state[224:]
         env.close()
         self.assertTrue(np.array_equal(before, after))
