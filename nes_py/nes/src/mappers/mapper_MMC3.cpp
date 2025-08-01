@@ -166,10 +166,15 @@ void MapperMMC3::clock_irq(NES_Address address) {
     if (!a12) {
         if (a12_low_counter < 0xff)
             ++a12_low_counter;
-        if (a12_low_counter > 15)
-            irq_active = false;  // clear pending IRQ each frame
+        // Removed clearing of pending IRQ after a12_low_counter exceeds a
+        // threshold. MMC3 IRQs remain active until acknowledged by CPU
+        // writes to $E000 or $E001.
+        // if (a12_low_counter > 15)
+        //     irq_active = false;  // clear pending IRQ each frame
     }
-    if (a12 && !prev_a12 && a12_low_counter >= 6) {
+    // The MMC3 detects a rising edge after A12 has been low for at least
+    // ~6-8 PPU cycles. Using >= 7 provides a closer approximation.
+    if (a12 && !prev_a12 && a12_low_counter >= 7) {
         if (irq_counter == 0 || irq_reload) {
             irq_counter = irq_latch;
             irq_reload = false;
