@@ -36,7 +36,8 @@ class Cartridge {
         name_table_mirroring(0),
         mapper_number(0),
         has_extended_ram(false),
-        prg_ram_banks(1) { }
+        prg_ram_banks(0) { }
+
 
     /// Return the ROM data.
     const inline std::vector<NES_Byte>& getROM() { return prg_rom; }
