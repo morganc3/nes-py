@@ -13,6 +13,7 @@
 #include "mappers/mapper_SxROM.hpp"
 #include "mappers/mapper_UxROM.hpp"
 #include "mappers/mapper_CNROM.hpp"
+#include "mappers/mapper_MMC3.hpp"
 
 namespace NES {
 
@@ -22,23 +23,29 @@ enum class MapperID : NES_Byte {
     SxROM = 1,
     UxROM = 2,
     CNROM = 3,
+    MMC3  = 4,
 };
 
-/// Create a mapper for the given cartridge with optional callback function
+/// Create a mapper for the given cartridge with optional callbacks
 ///
 /// @param game the cartridge to initialize a mapper for
-/// @param callback the callback function for the mapper (if necessary)
+/// @param mirroring_cb callback used when mirroring mode changes
+/// @param irq_cb callback used to raise IRQ interrupts
 ///
-Mapper* MapperFactory(Cartridge* game, std::function<void(void)> callback) {
+Mapper* MapperFactory(Cartridge* game,
+                      std::function<void(void)> mirroring_cb,
+                      std::function<void(void)> irq_cb) {
     switch (static_cast<MapperID>(game->getMapper())) {
         case MapperID::NROM:
             return new MapperNROM(game);
         case MapperID::SxROM:
-            return new MapperSxROM(game, callback);
+            return new MapperSxROM(game, mirroring_cb);
         case MapperID::UxROM:
             return new MapperUxROM(game);
         case MapperID::CNROM:
             return new MapperCNROM(game);
+        case MapperID::MMC3:
+            return new MapperMMC3(game, mirroring_cb, irq_cb);
         default:
             return nullptr;
     }

@@ -33,8 +33,12 @@ NES_Byte MainBus::read(NES_Address address) {
     } else if (address < 0x6000) {
         LOG(InfoVerbose) << "Expansion ROM read attempted. This is currently unsupported" << std::endl;
     } else if (address < 0x8000) {
-        if (mapper->hasExtendedRAM())
-            return extended_ram[address - 0x6000];
+        if (mapper->hasExtendedRAM()) {
+            if (mapper->isPRGRAMEnabled())
+                return extended_ram[address - 0x6000];
+            else
+                return 0;
+        }
     } else {
         return mapper->readPRG(address);
     }
@@ -63,8 +67,10 @@ void MainBus::write(NES_Address address, NES_Byte value) {
     } else if (address < 0x6000) {
         LOG(InfoVerbose) << "Expansion ROM access attempted. This is currently unsupported" << std::endl;
     } else if (address < 0x8000) {
-        if (mapper->hasExtendedRAM())
-            extended_ram[address - 0x6000] = value;
+        if (mapper->hasExtendedRAM()) {
+            if (mapper->isPRGRAMEnabled() && !mapper->isPRGRAMWriteProtected())
+                extended_ram[address - 0x6000] = value;
+        }
     } else {
         mapper->writePRG(address, value);
     }
@@ -79,7 +85,7 @@ const NES_Byte* MainBus::get_page_pointer(NES_Byte page) {
     else if (address < 0x6000)
         LOG(Error) << "Expansion ROM access attempted, which is unsupported" << std::endl;
     else if (address < 0x8000)
-        if (mapper->hasExtendedRAM())
+        if (mapper->hasExtendedRAM() && mapper->isPRGRAMEnabled())
             return &extended_ram[address - 0x6000];
 
     return nullptr;

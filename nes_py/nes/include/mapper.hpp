@@ -44,6 +44,12 @@ class Mapper {
     /// Return true if this mapper has extended RAM, false otherwise.
     inline bool hasExtendedRAM() { return cartridge->hasExtendedRAM(); }
 
+    /// Return true if PRG-RAM is enabled and should be accessible.
+    inline virtual bool isPRGRAMEnabled() { return true; }
+
+    /// Return true if PRG-RAM writes should be ignored.
+    inline virtual bool isPRGRAMWriteProtected() { return false; }
+
     /// Read a byte from the PRG RAM.
     ///
     /// @param address the 16-bit address of the byte to read
