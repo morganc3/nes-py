@@ -321,3 +321,13 @@ class ShouldReadLegendOfZelda(ShouldReadROMHeaderTestCase, TestCase):
     prg_rom_stop = 16 + 128 * 2**10
     chr_rom_start = 16 + 128 * 2**10
     chr_rom_stop = (16 + 128 * 2**10) + 0
+
+
+class ShouldDetectExtendedRAM(TestCase):
+    """Check extended RAM detection for ROMs without battery-backed RAM."""
+
+    def test_super_mario_bros_3_has_extended_ram(self):
+        rom_path = rom_file_abs_path('super-mario-bros-3.nes')
+        rom = ROM(rom_path)
+        self.assertTrue(rom.has_extended_ram)
+        self.assertFalse(rom.has_battery_backed_ram)

@@ -27,13 +27,16 @@ class Cartridge {
     NES_Byte mapper_number;
     /// whether this cartridge uses extended RAM
     bool has_extended_ram;
+    /// the number of 8KB PRG-RAM banks detected
+    std::size_t prg_ram_banks;
 
  public:
     /// Initialize a new cartridge
     Cartridge() :
         name_table_mirroring(0),
         mapper_number(0),
-        has_extended_ram(false) { }
+        has_extended_ram(false),
+        prg_ram_banks(1) { }
 
     /// Return the ROM data.
     const inline std::vector<NES_Byte>& getROM() { return prg_rom; }
@@ -49,6 +52,9 @@ class Cartridge {
 
     /// Return a boolean determining whether this cartridge uses extended RAM.
     inline bool hasExtendedRAM() { return has_extended_ram; }
+
+    /// Return the number of 8KB PRG-RAM banks on this cartridge.
+    inline std::size_t getPRGRAMBankCount() { return prg_ram_banks; }
 
     /// Load a ROM file into the cartridge and build the corresponding mapper.
     void loadFromFile(std::string path);

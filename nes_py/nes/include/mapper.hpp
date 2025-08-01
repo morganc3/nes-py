@@ -44,6 +44,9 @@ class Mapper {
     /// Return true if this mapper has extended RAM, false otherwise.
     inline bool hasExtendedRAM() { return cartridge->hasExtendedRAM(); }
 
+    /// Return the number of 8KB PRG-RAM banks on the cartridge.
+    inline std::size_t getPRGRAMBankCount() { return cartridge->getPRGRAMBankCount(); }
+
     /// Return true if PRG-RAM is enabled and should be accessible.
     inline virtual bool isPRGRAMEnabled() { return true; }
 
