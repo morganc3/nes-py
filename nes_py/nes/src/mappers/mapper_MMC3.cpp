@@ -172,9 +172,16 @@ void MapperMMC3::clock_irq(NES_Address address) {
         // if (a12_low_counter > 15)
         //     irq_active = false;  // clear pending IRQ each frame
     }
-    // The MMC3 detects a rising edge after A12 has been low for at least
-    // ~6-8 PPU cycles. Using >= 7 provides a closer approximation.
-    if (a12 && !prev_a12 && a12_low_counter >= 7) {
+    // The MMC3 detects a rising edge after A12 has been low for a sufficient
+    // number of PPU cycles.  Hardware tests show the line must be held low for
+    // at least 8 cycles in order to register a new edge.  The previous
+    // implementation used a threshold of 7 cycles which could occasionally
+    // register spurious edges.  This caused the scanline counter to tick more
+    // than once per line and the status bar in games such as Super Mario Bros
+    // 3 would scroll with the camera instead of remaining fixed.  Requiring a
+    // full 8 cycle separation between edges more accurately matches hardware
+    // behaviour and keeps the IRQ timing stable.
+    if (a12 && !prev_a12 && a12_low_counter >= 8) {
         if (irq_counter == 0 || irq_reload) {
             irq_counter = irq_latch;
             irq_reload = false;

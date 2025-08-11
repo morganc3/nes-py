@@ -93,6 +93,8 @@ const NES_Byte* MainBus::get_page_pointer(NES_Byte page) {
 
 void MainBus::set_mapper(Mapper* mapper) {
     this->mapper = mapper;
+    if (!mapper)
+        return;
     if (mapper->hasExtendedRAM()) {
         std::size_t banks = mapper->getPRGRAMBankCount();
         if (banks == 0)

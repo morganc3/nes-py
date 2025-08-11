@@ -8,6 +8,7 @@
 #include "emulator.hpp"
 #include "mapper_factory.hpp"
 #include "log.hpp"
+#include <stdexcept>
 
 namespace NES {
 
@@ -38,6 +39,12 @@ Emulator::Emulator(std::string rom_path) {
         [&]() { picture_bus.update_mirroring(); },
         [&]() { cpu.interrupt(bus, CPU::IRQ_INTERRUPT); }
     );
+    if (!mapper) {
+        throw std::runtime_error(
+            "Unsupported mapper: " +
+            std::to_string(cartridge.getMapper())
+        );
+    }
     // give the IO buses a pointer to the mapper
     bus.set_mapper(mapper);
     picture_bus.set_mapper(mapper);
