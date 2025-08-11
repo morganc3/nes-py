@@ -161,20 +161,28 @@ void MapperMMC3::update_banks() {
     }
 }
 
+namespace {
+/// Minimum number of consecutive low PPU cycles on A12 before a rising edge
+/// can be counted. Empirically, eight cycles emulate the hardware filter.
+constexpr int A12_LOW_THRESHOLD = 8;
+/// After A12 has been low for this many cycles, assume a new frame and clear
+/// any pending IRQ.
+constexpr int A12_FRAME_CLEAR_THRESHOLD = 16;
+}  // namespace
+
 void MapperMMC3::clock_irq(NES_Address address) {
     bool a12 = address & 0x1000;
     if (!a12) {
         if (a12_low_counter < 0xff)
             ++a12_low_counter;
-        // Removed clearing of pending IRQ after a12_low_counter exceeds a
-        // threshold. MMC3 IRQs remain active until acknowledged by CPU
-        // writes to $E000 or $E001.
-        // if (a12_low_counter > 15)
-        //     irq_active = false;  // clear pending IRQ each frame
+        if (a12_low_counter > A12_FRAME_CLEAR_THRESHOLD)
+            irq_active = false;
     }
-    // The MMC3 detects a rising edge after A12 has been low for at least
-    // ~6-8 PPU cycles. Using >= 7 provides a closer approximation.
-    if (a12 && !prev_a12 && a12_low_counter >= 7) {
+    // The MMC3 detects a rising edge only after A12 has remained low for a
+    // sufficient number of PPU cycles. Ensuring a full 8-cycle separation
+    // prevents spurious edges that would tick the scanline counter more than
+    // once per line.
+    if (a12 && !prev_a12 && a12_low_counter >= A12_LOW_THRESHOLD) {
         if (irq_counter == 0 || irq_reload) {
             irq_counter = irq_latch;
             irq_reload = false;
